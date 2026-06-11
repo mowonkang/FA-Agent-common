@@ -1,0 +1,11 @@
+python-pptx>=0.6.23
+python-docx>=1.1.0
+openpyxl>=3.1.0
+pypdf>=4.0.0
+
+# ── FA Agent 챗봇 프론트엔드 + 백엔드 (backend/, frontend/) ──
+fastapi>=0.110.0
+uvicorn[standard]>=0.27.0
+pydantic>=2.0
+python-multipart>=0.0.9
+claude-agent-sdk>=0.1.0

@@ -1,0 +1,21 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+
+outputs/.cache/
+outputs/_v2_input_*.md
+
+uploads/
+
+node_modules/
+.claude/skills/fa-task-discovery/scripts/package-lock.json
+
+# memory MCP persistent knowledge graph (local-only)
+.claude/memory.json
+
+# SessionStart 훅이 매번 자동 재생성하는 인덱스 — 추적하면 매 세션마다
+# 노이즈 PR과 conflict가 발생하므로 untrack. 로컬에서는 build_reference_index.py 가 재생성.
+references/INDEX.md
+references/manifest.json

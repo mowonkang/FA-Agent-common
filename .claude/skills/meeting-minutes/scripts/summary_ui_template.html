@@ -1,0 +1,77 @@
+<!-- 요약 선택 & 수정 UI - show_widget widget_code 템플릿 -->
+<!-- SUMMARY_ITEMS_PLACEHOLDER 를 JSON 배열로 교체 -->
+
+<h2 class="sr-only">회의 요약 항목 선택 및 수정</h2>
+<div style="padding:1rem 0">
+  <p style="font-size:13px;color:var(--color-text-secondary);margin:0 0 12px">
+    AI가 생성한 요약 항목입니다. 포함할 항목을 선택하고 필요 시 수정하세요. 슬라이드에는 최대 6개 항목이 들어갑니다.
+  </p>
+  <div id="cards" style="display:flex;flex-direction:column;gap:10px"></div>
+  <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap">
+    <button onclick="addCard()" style="font-size:13px;padding:6px 14px">+ 항목 추가</button>
+    <button onclick="submitSummary()" style="font-size:13px;padding:6px 14px;background:var(--color-background-info);color:var(--color-text-info);border-color:var(--color-border-info)">최종 확인 ↗</button>
+  </div>
+</div>
+<script>
+const items = SUMMARY_ITEMS_PLACEHOLDER;
+let idCounter = items.length;
+
+function renderCard(item, idx){
+  const div=document.createElement('div');
+  div.dataset.id=item.id;
+  div.style.cssText='background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:12px 14px;position:relative';
+  div.innerHTML=`
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+      <input type="checkbox" checked id="chk-${item.id}" style="width:16px;height:16px;cursor:pointer">
+      <span style="font-size:12px;font-weight:500;color:var(--color-text-secondary);min-width:28px">${String(idx+1).padStart(2,'0')}</span>
+      <input value="${item.주관부서||''}" placeholder="주관부서" style="width:120px;font-size:12px;padding:3px 7px" title="주관부서">
+      <input value="${item.기한||'YY.MM'}" placeholder="YY.MM" style="width:72px;font-size:12px;padding:3px 7px;text-align:center" title="완료/보고기한 — 월(YY.MM) 또는 Comment 중 하나만">
+      <button onclick="removeCard(this)" style="margin-left:auto;font-size:12px;padding:2px 8px;color:var(--color-text-danger);border-color:var(--color-border-danger)">삭제</button>
+    </div>
+    <textarea rows="2" placeholder="요약 내용" style="width:100%;box-sizing:border-box;font-size:13px;resize:vertical;margin-bottom:6px">${item.요약||''}</textarea>
+    <input value="${item.코멘트||''}" placeholder="코멘트 또는 세부 내용" style="width:100%;box-sizing:border-box;font-size:12px;color:var(--color-text-secondary)" title="코멘트">`;
+  return div;
+}
+
+function rebuildCards(){
+  const container=document.getElementById('cards');
+  [...container.children].forEach((c,i)=>{
+    const numEl=c.querySelector('span');
+    if(numEl)numEl.textContent=String(i+1).padStart(2,'0');
+  });
+}
+
+function removeCard(btn){
+  btn.closest('[data-id]').remove();
+  rebuildCards();
+}
+
+function addCard(){
+  idCounter++;
+  const item={id:idCounter,주관부서:'',요약:'',코멘트:'',기한:''};
+  const container=document.getElementById('cards');
+  container.appendChild(renderCard(item,container.children.length));
+}
+
+function submitSummary(){
+  const cards=[...document.getElementById('cards').children];
+  const lines=[];
+  cards.forEach((card,i)=>{
+    const chk=card.querySelector('input[type=checkbox]');
+    if(!chk||!chk.checked)return;
+    const inputs=[...card.querySelectorAll('input:not([type=checkbox])')];
+    const textarea=card.querySelector('textarea');
+    const dept=(inputs[0]?.value||'').trim();
+    const deadline=(inputs[1]?.value||'').trim();
+    const summary=(textarea?.value||'').trim();
+    const comment=(inputs[2]?.value||'').trim();
+    if(!summary)return;
+    lines.push(`${i+1}|${dept}|${summary}|${comment}|${deadline}`);
+  });
+  if(!lines.length){alert('최소 1개 항목을 선택해 주세요.');return;}
+  sendPrompt('[선택요약]\n'+lines.join('\n'));
+}
+
+const container=document.getElementById('cards');
+items.forEach((item,i)=>container.appendChild(renderCard(item,i)));
+</script>

@@ -1,0 +1,172 @@
+name: Daily FA Task Discovery
+
+# 매일 KST 07:00 (= UTC 22:00 전날) 에 fa-task-discovery 스킬을 1회 실행 → 1 PR 원칙으로 돌린다.
+# 한 실행에서 ① 뉴스 수집 → ② 과제 후보 도출 → ③ 단일 2부 docx 생성 → ④ 단일 PR 자동 생성까지
+# 모두 끝내고, 중간 단계에서는 절대 commit/push/PR 을 만들지 않는다.
+#
+# 필요 시크릿 (Settings > Secrets and variables > Actions):
+#   - CLAUDE_CODE_OAUTH_TOKEN (Claude.ai Pro/Max 구독 OAuth 토큰)
+#     또는
+#   - ANTHROPIC_API_KEY (유료 Anthropic API 키)
+#
+# 수동 실행: Actions 탭에서 "Run workflow" 버튼.
+
+on:
+  schedule:
+    - cron: '0 22 * * *'  # 22:00 UTC = 07:00 KST (다음 날)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write   # PR 자동 생성에 필요
+  id-token: write        # Claude Code Action 의 OIDC 토큰 발급
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install fa-task-discovery script deps
+        working-directory: .claude/skills/fa-task-discovery/scripts
+        run: npm install --silent
+
+      - name: Compute report date (KST)
+        id: date
+        run: |
+          KST_DATE=$(TZ=Asia/Seoul date +%Y%m%d)
+          KST_DISPLAY=$(TZ=Asia/Seoul date +%Y-%m-%d)
+          echo "ymd=$KST_DATE"   >> "$GITHUB_OUTPUT"
+          echo "ymd_dash=$KST_DISPLAY" >> "$GITHUB_OUTPUT"
+
+      - name: Run Claude (fa-task-discovery skill — 1실행=1PR)
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          # Console API 키를 쓰려면 위 줄 대신 다음 줄을 사용:
+          # anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            오늘은 ${{ steps.date.outputs.ymd_dash }} (KST) 입니다.
+            워킹 디렉토리: $GITHUB_WORKSPACE (= 리포지토리 루트)
+
+            `fa-task-discovery` 스킬을 **자동 모드** 로, **한 번의 실행에서 1단계부터 5단계까지
+            끝까지** 수행하세요. 뉴스 docx 따위 중간 산출물에서 멈추지 마세요.
+
+            ## 결과물 저장 위치 (절대경로 — 반드시 이 경로 그대로 사용)
+            - news.json:  `$GITHUB_WORKSPACE/outputs/fa-task-discovery/news_${{ steps.date.outputs.ymd }}.json`
+            - tasks.json: `$GITHUB_WORKSPACE/outputs/fa-task-discovery/tasks_${{ steps.date.outputs.ymd }}.json`
+            - 최종 docx:  `$GITHUB_WORKSPACE/outputs/fa-task-discovery/FA_기술과제후보_${{ steps.date.outputs.ymd }}.docx`
+              (제1부 뉴스 + 제2부 과제 후보 통합 보고서, 단 1개)
+
+            ## 실행 절차 (모두 한 실행에서 끝까지)
+            1. 6개 분야(AMR/AGV, 협동로봇, 디지털 트윈, 스마트 물류, AI 제조, 피지컬 AI) 동향을
+               WebSearch / WebFetch 로 수집 (Naver MCP·KakaoTalk MCP 는 CI 환경 미지원).
+               최근 30일 + 출처 URL + 발행일 확인된 기사만 채택.
+            2. 위 절대경로의 news.json 파일을 Write 도구로 생성
+               ({category, title, url, date, summary} 배열).
+            3. news.json 을 근거로 두 필터(① 배터리 라인 적용 가능 ② LGES 미발표) 로 5~10건 도출.
+            4. 위 절대경로의 tasks.json 파일을 Write 도구로 생성
+               ({num, category, title, trend, apply, reference} 배열).
+            5. 최종 docx 생성 — **절대경로 사용, `cd` 금지**:
+               ```
+               node $GITHUB_WORKSPACE/.claude/skills/fa-task-discovery/scripts/generate_report.js \
+                 $GITHUB_WORKSPACE/outputs/fa-task-discovery/FA_기술과제후보_${{ steps.date.outputs.ymd }}.docx \
+                 $GITHUB_WORKSPACE/outputs/fa-task-discovery/tasks_${{ steps.date.outputs.ymd }}.json \
+                 $GITHUB_WORKSPACE/outputs/fa-task-discovery/news_${{ steps.date.outputs.ymd }}.json
+               ```
+               (npm install 은 이 워크플로우의 이전 step 에서 이미 수행됨)
+            6. `ls -la $GITHUB_WORKSPACE/outputs/fa-task-discovery/` 로 3개 파일
+               (news.json, tasks.json, FA_기술과제후보_*.docx) 생성 확인 후 보고.
+
+            ## 금지 (1실행=1PR 원칙)
+            - **`cd` 명령 사용 금지** — 모두 절대경로로 처리.
+            - **카카오톡 요약 단계 금지** — KakaotalkChat MCP 는 CI 환경에 없습니다.
+            - **git add / commit / push / PR 생성 금지** — 다음 step 들이 단 1회만 처리합니다.
+              Claude 가 중간에 직접 git/PR 을 만들면 PR 이 분산되어 사용자 요청(1실행=1PR)을 어깁니다.
+            - **뉴스만 담은 별도 docx 생성 금지** — 최종 docx 는 위 절대경로의 1개만.
+
+      - name: Debug — show generated artifacts
+        if: always()
+        run: |
+          echo "===== outputs/ tree ====="
+          find outputs -type f | head -50 || true
+          echo "===== stray artifacts ====="
+          find . -maxdepth 2 -type f \( -name 'FA_*.docx' -o -name 'tasks_*.json' -o -name 'news_*.json' \) \
+            -not -path './.git/*' -not -path './node_modules/*' 2>/dev/null || true
+
+      - name: Normalize artifact locations
+        run: |
+          mkdir -p outputs/fa-task-discovery
+          for pat in 'FA_*.docx' 'tasks_*.json' 'news_*.json'; do
+            while IFS= read -r f; do
+              [ -z "$f" ] && continue
+              echo "moving stray: $f -> outputs/fa-task-discovery/"
+              mv "$f" outputs/fa-task-discovery/ 2>/dev/null || true
+            done < <(find . -type f -name "$pat" \
+                       -not -path './outputs/fa-task-discovery/*' \
+                       -not -path './.git/*' \
+                       -not -path './node_modules/*' 2>/dev/null)
+          done
+          # 사용자 요청에 따라 "뉴스만 담은 별도 docx" (FA_뉴스브리핑_*) 는 PR 에 포함하지 않는다 — 삭제.
+          rm -f outputs/fa-task-discovery/FA_뉴스브리핑_*.docx 2>/dev/null || true
+          echo "===== final outputs/fa-task-discovery/ ====="
+          ls -la outputs/fa-task-discovery/
+
+      - name: Commit to dated branch and open single PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          BR="fa-task-discovery/auto/${{ steps.date.outputs.ymd }}"
+          git switch -c "$BR" 2>/dev/null || git switch "$BR"
+
+          # SessionStart 훅 등에 의해 변경된 .gitignore 대상 파일은 무시되므로
+          # outputs/fa-task-discovery/ 만 명시적으로 add 한다. PR 1개, 깔끔한 diff.
+          git add outputs/fa-task-discovery/
+          if git diff --staged --quiet; then
+            echo "::warning::No new artifacts produced by Claude step — nothing to commit."
+            exit 0
+          fi
+          git commit -m "chore(report): daily FA task discovery ${{ steps.date.outputs.ymd_dash }}"
+
+          # 날짜 브랜치 push (네트워크 일시 오류 대비 재시도). main 직접 push 금지.
+          pushed=0
+          for delay in 0 2 4 8 16; do
+            [ "$delay" != 0 ] && { echo "push retry in ${delay}s..."; sleep "$delay"; }
+            if git push -u origin "$BR"; then pushed=1; break; fi
+          done
+          if [ "$pushed" != 1 ]; then
+            echo "::error::branch push failed"; exit 1
+          fi
+
+          # 동일 head 의 열린 PR 이 없으면 새로 1개 생성 (있으면 추가 커밋으로 자동 갱신).
+          existing=$(gh pr list --head "$BR" --base main --state open --json number --jq '.[0].number' 2>/dev/null || echo "")
+          if [ -n "$existing" ]; then
+            echo "PR #$existing already open for $BR — updated by new commit."
+            exit 0
+          fi
+          {
+            echo "## 요약"
+            echo "fa-task-discovery 스킬 일배치(자동) 산출물입니다. 한 번의 실행에서 뉴스 수집 -> 과제 후보 도출 -> 단일 2부 docx 생성까지 마쳤습니다."
+            echo ""
+            echo "### 산출물 (outputs/fa-task-discovery/)"
+            echo "- news_*.json — 최근 30일 FA 6개 분야 검증 뉴스 (출처 URL 포함)"
+            echo "- tasks_*.json — 과제 후보 5~10건"
+            echo "- FA_기술과제후보_*.docx — 제1부 뉴스 + 제2부 과제 (단일 보고서)"
+            echo ""
+            echo "PR 은 한 실행에 1개만 만듭니다. 카카오톡 요약은 CI 환경 미지원으로 생략됩니다."
+          } > /tmp/fa_pr_body.md
+          gh pr create --base main --head "$BR" \
+            --title "FA 기술과제후보 ${{ steps.date.outputs.ymd_dash }} (daily auto)" \
+            --body-file /tmp/fa_pr_body.md

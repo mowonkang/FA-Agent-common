@@ -1,0 +1,51 @@
+<!-- 참석자 입력 UI - show_widget으로 렌더링 시 이 전체 내용을 widget_code에 넣는다 -->
+<!-- 이 파일은 show_widget 호출 시 widget_code 파라미터로 사용하는 템플릿 -->
+<!-- ATTENDEE_ROWS_PLACEHOLDER 를 실제 행 수(또는 빈 행 데이터)로 교체 -->
+
+<h2 class="sr-only">참석자 정보 입력 폼</h2>
+<div style="padding:1rem 0">
+  <p style="font-size:14px;color:var(--color-text-secondary);margin:0 0 1rem">
+    녹취록에서 발화자를 확인했습니다. 각 참석자의 정보를 입력해 주세요.
+  </p>
+  <table id="att-table" style="width:100%;border-collapse:collapse;font-size:13px">
+    <thead>
+      <tr style="border-bottom:0.5px solid var(--color-border-tertiary)">
+        <th style="text-align:left;padding:6px 8px;color:var(--color-text-secondary);font-weight:500">회사/법인</th>
+        <th style="text-align:left;padding:6px 8px;color:var(--color-text-secondary);font-weight:500">조직</th>
+        <th style="text-align:left;padding:6px 8px;color:var(--color-text-secondary);font-weight:500">직책</th>
+        <th style="text-align:left;padding:6px 8px;color:var(--color-text-secondary);font-weight:500">이름</th>
+        <th style="width:32px"></th>
+      </tr>
+    </thead>
+    <tbody id="att-body"></tbody>
+  </table>
+  <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
+    <button onclick="addRow()" style="font-size:13px;padding:6px 14px">+ 참석자 추가</button>
+    <button onclick="submit()" style="font-size:13px;padding:6px 14px;background:var(--color-background-info);color:var(--color-text-info);border-color:var(--color-border-info)">다음 단계 (요약 생성) ↗</button>
+  </div>
+</div>
+<script>
+const defaultRows = ATTENDEE_ROWS_PLACEHOLDER;
+function addRow(company='',org='',title='',name=''){
+  const tbody=document.getElementById('att-body');
+  const tr=document.createElement('tr');
+  tr.innerHTML=`
+    <td style="padding:4px 8px"><input style="width:100%;box-sizing:border-box" value="${company}" placeholder="LGES"></td>
+    <td style="padding:4px 8px"><input style="width:100%;box-sizing:border-box" value="${org}" placeholder="FA기술담당"></td>
+    <td style="padding:4px 8px"><input style="width:80px" value="${title}" placeholder="책임"></td>
+    <td style="padding:4px 8px"><input style="width:80px" value="${name}" placeholder="홍길동"></td>
+    <td style="padding:4px"><button onclick="this.closest('tr').remove()" style="font-size:12px;padding:2px 8px;color:var(--color-text-danger);border-color:var(--color-border-danger)">삭제</button></td>`;
+  tbody.appendChild(tr);
+}
+function submit(){
+  const rows=[...document.querySelectorAll('#att-body tr')];
+  const lines=rows.map(tr=>{
+    const inputs=tr.querySelectorAll('input');
+    return [...inputs].map(i=>i.value.trim()).join('|');
+  }).filter(l=>l.replace(/\|/g,'').trim());
+  if(!lines.length){alert('참석자를 최소 1명 이상 입력해 주세요.');return;}
+  sendPrompt('[참석자정보]\n'+lines.join('\n'));
+}
+defaultRows.forEach(r=>addRow(r[0],r[1],r[2],r[3]));
+if(!defaultRows.length)addRow();
+</script>

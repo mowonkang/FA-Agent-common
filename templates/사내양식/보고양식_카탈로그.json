@@ -1,0 +1,356 @@
+{
+  "schema_version": "1.0",
+  "source_file": "templates/사내양식/(보고양식)YYMMDD_보고제목_v1.0.pptx",
+  "note": "양식·톤·색·사이즈는 참고 가이드이며 가독성·스토리를 위해 자율 조정 가능. 단 산출물 텍스트는 박스를 벗어나선 안 됨. 상세는 templates/사내양식/보고양식_카탈로그.md 참조.",
+  "slide_size_emu": {
+    "width_emu": 9906000,
+    "height_emu": 6858000
+  },
+  "slide_size_cm": {
+    "width": 27.52,
+    "height": 19.05
+  },
+  "archetypes": [
+    {
+      "id": "A",
+      "name": "보고 프레임 표준",
+      "description": "분류·제목·세션메시지·내용요약·풋노트 — 메인 한 장 요약 레이아웃 기준",
+      "slides": [
+        0
+      ]
+    },
+    {
+      "id": "G",
+      "name": "As-Is / To-Be 전환",
+      "description": "현재 vs 미래 상태 비교 (적용 현황·Head message)",
+      "slides": [
+        1,
+        10
+      ]
+    },
+    {
+      "id": "B",
+      "name": "Master Plan 일정·로드맵",
+      "description": "분기 Gantt, Kick Off→상세설계→검증, 자동화 과제 지속 발굴",
+      "slides": [
+        2
+      ]
+    },
+    {
+      "id": "C",
+      "name": "투자비·예산 (Capex/KPI)",
+      "description": "설비 투자비 As-is/To-be, 억원, 증감·비고, 레거시 버전 비교",
+      "slides": [
+        3
+      ]
+    },
+    {
+      "id": "F",
+      "name": "기술 사양·구성 최적화",
+      "description": "설비 구성 방안, 기존안/변경안/Concept, 환경 조건, 개발 과제 사양·프로토타입 개선",
+      "slides": [
+        4,
+        8,
+        9
+      ]
+    },
+    {
+      "id": "D",
+      "name": "추진체계·조직도",
+      "description": "ES/PRI/CNS 매트릭스, 총원·상근·비상근, 리더·스폰서 체계",
+      "slides": [
+        5
+      ]
+    },
+    {
+      "id": "E",
+      "name": "전략 추진방향·컨셉",
+      "description": "지향점·중점과제, Task 1.0/2.0, 설비 컨셉(이미지 중심)",
+      "slides": [
+        6,
+        7
+      ]
+    },
+    {
+      "id": "H",
+      "name": "향후계획·검증",
+      "description": "보조 과제, Concept PoC 검증 항목·결과 로드맵, 참고 내용",
+      "slides": [
+        11
+      ]
+    }
+  ],
+  "slides": [
+    {
+      "index": 0,
+      "archetype_id": "A",
+      "title": "분류 1",
+      "purpose": "보고 프레임 가이드 — 분류 1~4 / 제목 / 세션 메시지 / 내용 요약 / 표·일정·보조자료 / Foot note 의 표준 레이아웃 (메인 요약 슬라이드 기준)",
+      "layout_name": "빈 화면",
+      "placeholder_cues": [
+        "Foot note",
+        "Footnote",
+        "Head message",
+        "분류 1",
+        "분류 2",
+        "분류 3",
+        "분류 4",
+        "세션 메시지"
+      ],
+      "explicit_placeholders": [],
+      "table": {
+        "rows": 5,
+        "cols": 5,
+        "header": []
+      },
+      "has_image": false,
+      "page_indicator": "1/2"
+    },
+    {
+      "index": 1,
+      "archetype_id": "G",
+      "title": "보조. <예시>레이아웃",
+      "purpose": "보조 레이아웃 — As-is 적용 현황 vs To-be 비교",
+      "layout_name": "2_제목 슬라이드",
+      "placeholder_cues": [],
+      "explicit_placeholders": [],
+      "table": {
+        "rows": 9,
+        "cols": 3,
+        "header": []
+      },
+      "has_image": false,
+      "page_indicator": "2/2"
+    },
+    {
+      "index": 2,
+      "archetype_id": "B",
+      "title": "보조. 1 / 1",
+      "purpose": "Master Plan — 분기 타임라인(Kick Off·Ideation·컨셉구체화·상세설계·내구성/신뢰성 품평회), Pre Task·F-Test·Demo·Pilot 검증",
+      "layout_name": "제목 및 내용",
+      "placeholder_cues": [],
+      "explicit_placeholders": [],
+      "table": {
+        "rows": 10,
+        "cols": 36,
+        "header": [
+          "구분",
+          "’25 Feb.",
+          "Mar.",
+          "Apr.",
+          "May.",
+          "Jun.",
+          "Jul.",
+          "Aug.",
+          "Sep.",
+          "Oct.",
+          "Nov.",
+          "Dec.",
+          "비고"
+        ]
+      },
+      "has_image": false,
+      "page_indicator": "1/1"
+    },
+    {
+      "index": 3,
+      "archetype_id": "C",
+      "title": "보조. <예시>ESXX 예상 투자비",
+      "purpose": "투자비 분석 — 물류/전극조립활성화/건설/설계용역 As-is·To-be·증감·비고 (억원), 레거시 1.0/2.0 비교",
+      "layout_name": "제목 슬라이드",
+      "placeholder_cues": [
+        "ESXX"
+      ],
+      "explicit_placeholders": [],
+      "table": {
+        "rows": 20,
+        "cols": 8,
+        "header": [
+          "구분",
+          "투자 내역",
+          "As-is\n(5/21일子)",
+          "To-be\u000b(적용)",
+          "증감",
+          "비고"
+        ]
+      },
+      "has_image": false,
+      "page_indicator": "1/1"
+    },
+    {
+      "index": 4,
+      "archetype_id": "F",
+      "title": "보조. <예시>XX 설비 구성 방안",
+      "purpose": "설비 구성 방안 — 월별 설계·제작·구축·검증, Rack·메자닌·UT·벽체 구성·수량 매트릭스",
+      "layout_name": "제목 슬라이드",
+      "placeholder_cues": [
+        "ddddd"
+      ],
+      "explicit_placeholders": [],
+      "table": {
+        "rows": 5,
+        "cols": 11,
+        "header": [
+          "ESMI Lansing",
+          "2025년"
+        ]
+      },
+      "has_image": false,
+      "page_indicator": "1/1"
+    },
+    {
+      "index": 5,
+      "archetype_id": "D",
+      "title": "보조. <예시>Xxxx 조직도",
+      "purpose": "조직도 — 총원/상근/비상근, ES·PRI·CNS 팀, Co-Work, 리더·그룹장·센터장·사업부장·스폰서",
+      "layout_name": "제목 슬라이드",
+      "placeholder_cues": [
+        "Head message",
+        "Xxxx",
+        "xxxxx"
+      ],
+      "explicit_placeholders": [],
+      "table": {
+        "rows": 5,
+        "cols": 4,
+        "header": [
+          "구분",
+          "총원",
+          "상근",
+          "비상근"
+        ]
+      },
+      "has_image": false,
+      "page_indicator": "1/1"
+    },
+    {
+      "index": 6,
+      "archetype_id": "E",
+      "title": "보조. <예시>XX Task 추진방향",
+      "purpose": "Task 추진방향 — 지향점·중점과제, Task 1.0/2.0, Re-Usability·유연성·원가혁신, 개발 항목 As-is/To-be",
+      "layout_name": "1_제목 및 내용",
+      "placeholder_cues": [
+        "Footnote",
+        "Head message",
+        "xxxxx",
+        "xxxxxx",
+        "ㅇㅇㅇㅇㅇㅇ",
+        "ㅇㅇㅇㅇㅇㅇㅇ",
+        "강조색(FF0000)",
+        "년"
+      ],
+      "explicit_placeholders": [],
+      "table": {
+        "rows": 3,
+        "cols": 3,
+        "header": [
+          "구분",
+          "레거시",
+          "Task"
+        ]
+      },
+      "has_image": true,
+      "page_indicator": "1/1"
+    },
+    {
+      "index": 7,
+      "archetype_id": "E",
+      "title": "보조. <예시>설비 컨셉",
+      "purpose": "설비 컨셉 — 이미지 중심 컨셉 제시 (멀티 페이지 섹션 표지)",
+      "layout_name": "제목 슬라이드",
+      "placeholder_cues": [],
+      "explicit_placeholders": [],
+      "table": null,
+      "has_image": false,
+      "page_indicator": "1/5"
+    },
+    {
+      "index": 8,
+      "archetype_id": "F",
+      "title": "보조. <예시>구성 최적화",
+      "purpose": "구성 최적화 — 기존안/변경안/Concept, 정면도·필요면적·온습도 조건, Alt1/Alt2 대안 비교",
+      "layout_name": "제목 및 내용",
+      "placeholder_cues": [
+        "강조색(FF0000)"
+      ],
+      "explicit_placeholders": [],
+      "table": {
+        "rows": 6,
+        "cols": 3,
+        "header": [
+          "구분",
+          "기존안",
+          "변경안"
+        ]
+      },
+      "has_image": false,
+      "page_indicator": "3/3"
+    },
+    {
+      "index": 9,
+      "archetype_id": "F",
+      "title": "보조. <예시> 개발 과제",
+      "purpose": "개발 과제 — 운반물·사이즈·중량 사양, 반송 구간 요건, 프로토타입 경량화·Loss 저감 정량 개선",
+      "layout_name": "제목 슬라이드",
+      "placeholder_cues": [
+        "24년",
+        "25년",
+        "xxxx",
+        "xxxxx"
+      ],
+      "explicit_placeholders": [],
+      "table": {
+        "rows": 5,
+        "cols": 3,
+        "header": [
+          "운반물",
+          "각형 Tray",
+          " 믹서 원자재"
+        ]
+      },
+      "has_image": false,
+      "page_indicator": "1/1"
+    },
+    {
+      "index": 10,
+      "archetype_id": "G",
+      "title": "보조. <예시> 과제",
+      "purpose": "과제 AS-IS / TO-BE — 프로세스·시스템 전환 비교 (Head message)",
+      "layout_name": "제목 및 내용",
+      "placeholder_cues": [
+        "Head message"
+      ],
+      "explicit_placeholders": [],
+      "table": null,
+      "has_image": false,
+      "page_indicator": "1/2"
+    },
+    {
+      "index": 11,
+      "archetype_id": "H",
+      "title": "향후계획",
+      "purpose": "향후계획 — 보조 과제, Concept PoC 검증 항목/결과/주요 검증 항목 로드맵",
+      "layout_name": "제목 슬라이드",
+      "placeholder_cues": [
+        "ddddd",
+        "ddddddd"
+      ],
+      "explicit_placeholders": [],
+      "table": {
+        "rows": 7,
+        "cols": 3,
+        "header": [
+          "구분",
+          "검증항목",
+          "검증결과"
+        ]
+      },
+      "has_image": false,
+      "page_indicator": "2/2"
+    }
+  ],
+  "summary": {
+    "slide_count": 12,
+    "archetype_count": 8
+  }
+}

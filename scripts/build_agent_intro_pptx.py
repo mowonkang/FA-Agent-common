@@ -5,8 +5,9 @@
   2 (보조)        : data-teammate / ops-teammate 상세
   3 (보조)        : tech-research-teammate / document-writer / ppt-writer 상세
   4 (보조)        : 에이전트 협업 패턴
+  5 (보조)        : 스킬 라이브러리·품질 게이트 (운영 인프라)
 
-출력: outputs/에이전트_소개_2026-05-29.pptx
+출력: outputs/에이전트_소개_2026-06-11.pptx
 """
 from __future__ import annotations
 
@@ -28,9 +29,9 @@ from _ppt_layout import (  # noqa: E402
     FONT_BODY, write_lines,
 )
 
-OUT_PATH = Path("outputs/에이전트_소개_2026-05-29.pptx")
-BYLINE = ["FA 기술담당", "(2026.05.29)"]
-FOOT_MAIN = "* 본 자료는 레포지토리 .claude/agents/ 정의 기반으로 작성되었습니다."
+OUT_PATH = Path("outputs/에이전트_소개_2026-06-11.pptx")
+BYLINE = ["FA 기술담당", "(2026.06.11)"]
+FOOT_MAIN = "* 본 자료는 레포지토리 .claude/agents/ 정의 및 CLAUDE.md 기반으로 작성되었습니다."
 
 
 # ─── 슬라이드 1: 메인 (분류형) ─────────────────────────────────────────────
@@ -310,6 +311,66 @@ def build_slide4(prs):
     )
 
 
+# ─── 슬라이드 5: 보조 — 스킬 라이브러리·품질 게이트 ───────────────────────
+def build_slide5(prs):
+    slide = prs.slides.add_slide(prs.slide_layouts[6])
+    render_classified_slide(
+        slide,
+        title="스킬 라이브러리 · 품질 게이트 (운영 인프라)",
+        byline=BYLINE,
+        head_message=[
+            ("에이전트 팀은 도메인 스킬 13종과 자동 품질 게이트 위에서 동작하여 "
+             "산출물의 양식·출처·브랜드 일관성을 보장합니다.",
+             {"size": SZ_HEAD, "bold": True, "color": BLACK}),
+        ],
+        sections=[
+            {
+                "label": "도메인\n스킬",
+                "session_message": "회의록·과제발굴·문서형식 등 13종 — 요청 키워드로 자동 트리거",
+                "table": {
+                    "headers": ["스킬", "용도", "트리거 예시"],
+                    "rows": [
+                        ("meeting-minutes / merger", "녹취록 → 회의록 PPTX / 통합 Word", "\"녹취록으로 회의록 만들어줘\""),
+                        ("fa-task-discovery", "FA 6분야 동향 리서치 → 과제 후보 docx", "\"FA 기술 동향 조사\", \"신규 과제 발굴\""),
+                        ("brand-guidelines", "LGES 표준 색·폰트·풋노트 자동 적용", "PPT/DOCX/MD 산출물 생성 시 자동"),
+                        ("xlsx / pdf / docx", "엑셀·PDF·Word 생성·추출·편집", "\"엑셀로 정리\", \"PDF 합쳐줘\""),
+                        ("doc-coauthoring / internal-comms", "장문 문서 협업·사내 공지/주간 메일", "\"제안서 같이 써줘\", \"사내 공지\""),
+                        ("skill-creator / mcp-builder", "신규 스킬 scaffold·사내 시스템 연동 PoC", "\"스킬 만들어줘\", \"MCP 서버\""),
+                    ],
+                    "col_w": [6.5, 9.8, 7.5],
+                    "row_h": 0.80,
+                    "body_size": SZ_SUB,
+                },
+            },
+            {
+                "label": "품질\n게이트",
+                "session_message": "산출물 자동 검증 — 추측 금지·출처 명시 원칙의 시스템화",
+                "content": [
+                    (" • TaskCompleted hook — outputs/*.md 의 출처 인용((출처: ...) / [N행] / 자료 미확인) 자동 검증, 누락 시 차단",
+                     {"size": SZ_BODY, "color": BLACK}),
+                    (" • SessionStart hook — references/ 인덱스(INDEX.md) 자동 갱신 → 모든 에이전트가 작업 전 참조 자료 인지",
+                     {"size": SZ_BODY, "color": BLACK}),
+                    (" • PPT 표준 — 분류형 레이아웃 헬퍼(scripts/_ppt_layout.py) 공용 사용, 텍스트 무오버플로 자동 경고",
+                     {"size": SZ_BODY, "color": BLACK}),
+                    (" • sentry-code-review — 신규 scripts/build_*.py 빌더의 에러 핸들링·운영 안전성 점검",
+                     {"size": SZ_SUB, "color": MID_GRAY}),
+                ],
+            },
+            {
+                "label": "절대\n원칙",
+                "session_message": "모든 에이전트 공통 — 4대 원칙",
+                "content": [
+                    (" • 추측 금지 — 자료가 없으면 \"찾지 못했습니다\" 명시  /  출처 명시 — 파일명·행 번호 함께 기재",
+                     {"size": SZ_BODY, "bold": True, "color": BLUE}),
+                    (" • 양식(templates/) ≠ 참조 자료(references/) 구분  /  결과물은 outputs/ 에만 생성, 원본 보존",
+                     {"size": SZ_BODY, "color": BLACK}),
+                ],
+            },
+        ],
+        footnote="* 출처 : CLAUDE.md (스킬·품질 게이트·절대 원칙)  │  scripts/hooks/check_output_citations.py  │  references/policy/분류형_보고_레이아웃_표준.md",
+    )
+
+
 def build():
     prs = Presentation()
     prs.slide_width = Cm(SLIDE_W_CM)
@@ -319,6 +380,7 @@ def build():
     build_slide2(prs)
     build_slide3(prs)
     build_slide4(prs)
+    build_slide5(prs)
 
     OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     if OUT_PATH.exists():

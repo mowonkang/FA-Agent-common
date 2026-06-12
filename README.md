@@ -1,6 +1,8 @@
 # claude_FA-Agent_1
 Claude code FA기술혁신 Part Agent
 
+> **처음 오셨나요?** GitHub·Claude·코드를 전혀 몰라도 따라할 수 있는 전 구성원용 시작 안내서: **[온보딩_가이드.md](온보딩_가이드.md)** (배포용 Word 사본: `outputs/FA-Agent_온보딩_가이드_*.docx`)
+
 ## 구성
 
 - 서브에이전트
